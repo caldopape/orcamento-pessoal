@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento Pessoal Mensal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: #e5dcc7;
+            color: #2e1d26;
+            line-height: 1.4;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: clamp(20px, 4vw, 24px);
+            font-weight: normal;
+            color: #2e1d26;
+        }
+
+        .month-selector {
+            background: #c0c2bd;
+            border: 1px solid #5e5a60;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .month-nav button {
+            background: #e5dcc7;
+            border: 1px solid #5e5a60;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Times New Roman', serif;
+            color: #2e1d26;
+        }
+
+        .month-nav button:hover {
+            background: #5e5a60;
+            color: #e5dcc7;
+        }
+
+        .current-month {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .quick-nav {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-nav button {
+            background: #e5dcc7;
+            border: 1px solid #5e5a60;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Times New Roman', serif;
+            font-size: 12px;
+            color: #2e1d26;
+        }
+
+        .quick-nav button:hover, .quick-nav button.active {
+            background: #5e5a60;
+            color: #e5dcc7;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #5e5a60;
+            padding: 15px;
+            background: #e5dcc7;
+        }
+
+        .section h2 {
+            margin-bottom: 15px;
+            font-size: clamp(16px, 3vw, 18px);
+            font-weight: normal;
+            color: #2e1d26;
+        }
+
+        .two-column {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .column {
+                min-width: 100%;
+            }
+        }
+
+        .form-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        input, select {
+            font-family: 'Times New Roman', serif;
+            padding: 8px;
+            border: 1px solid #5e5a60;
+            background: #e5dcc7;
+            color: #2e1d26;
+            font-size: 14px;
+            min-width: 0;
+        }
+
+        input[type="text"], input[type="number"], select {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        @media (max-width: 480px) {
+            input[type="text"], input[type="number"], select {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+
+        input[type="submit"], button {
+            background: #c0c2bd;
+            cursor: pointer;
+            padding: 8px 16px;
+            border: 1px solid #5e5a60;
+            font-family: 'Times New Roman', serif;
+            color: #2e1d26;
+            white-space: nowrap;
+        }
+
+        input[type="submit"]:hover, button:hover {
+            background: #5e5a60;
+            color: #e5dcc7;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #e5dcc7;
+            min-width: 500px;
+        }
+
+        th, td {
+            border: 1px solid #5e5a60;
+            padding: 8px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        @media (max-width: 480px) {
+            th, td {
+                padding: 4px;
+                font-size: 12px;
+            }
+        }
+
+        th {
+            background: #c0c2bd;
+            font-weight: normal;
+            color: #2e1d26;
+        }
+
+        .acoes {
+            white-space: nowrap;
+            width: 140px;
+        }
+
+        .btn {
+            background: #c0c2bd;
+            border: 1px solid #5e5a60;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-family: 'Times New Roman', serif;
+            font-size: 11px;
+            margin-right: 3px;
+            color: #2e1d26;
+        }
+
+        .btn:hover {
+            background: #5e5a60;
+            color: #e5dcc7;
+        }
+
+        .total {
+            text-align: right;
+            font-size: clamp(14px, 2.5vw, 16px);
+            margin-top: 10px;
+            padding: 10px;
+            background: #c0c2bd;
+            border: 1px solid #5e5a60;
+            color: #2e1d26;
+        }
+
+        .balance {
+            text-align: center;
+            font-size: clamp(16px, 3vw, 18px);
+            margin: 20px 0;
+            padding: 15px;
+            background: #c0c2bd;
+            border: 1px solid #5e5a60;
+            color: #2e1d26;
+        }
+
+        .negative {
+            color: #8d1e2d;
+            font-weight: bold;
+        }
+
+        .positive {
+            color: #2e1d26;
+            font-weight: bold;
+        }
+
+        .export-import {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #5e5a60;
+            background: #c0c2bd;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .file-input {
+            margin-bottom: 15px;
+        }
+
+        .editando {
+            background: #c0c2bd;
+        }
+
+        .edit-input {
+            width: 100%;
+            border: 1px solid #5e5a60;
+            padding: 2px;
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            background: #e5dcc7;
+            color: #2e1d26;
+        }
+
+        h3 {
+            color: #2e1d26;
+            font-weight: normal;
+            font-size: clamp(14px, 2.5vw, 16px);
+        }
+
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .resumo-anual {
+            background: #f0f0f0;
+            border: 2px solid #5e5a60;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .resumo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .resumo-card {
+            background: #e5dcc7;
+            border: 1px solid #5e5a60;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: #e5dcc7;
+            border: 1px solid #5e5a60;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-family: 'Times New Roman', serif;
+            color: #2e1d26;
+        }
+
+        .tab-button.active {
+            background: #5e5a60;
+            color: #e5dcc7;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Orçamento Pessoal - Mensal</h1>
+
+       <div class="month-selector">
+            <div class="month-nav">
+                <button onclick="navegarMes(-1)">◀ Mês Anterior</button>
+                <div class="current-month" id="mesAtual">Janeiro 2025</div>
+                <button onclick="navegarMes(1)">Próximo Mês ▶</button>
+            </div>
+            <div class="quick-nav">
+                <button onclick="irParaMes(0)">Jan</button>
+                <button onclick="irParaMes(1)">Fev</button>
+                <button onclick="irParaMes(2)">Mar</button>
+                <button onclick="irParaMes(3)">Abr</button>
+                <button onclick="irParaMes(4)">Mai</button>
+                <button onclick="irParaMes(5)">Jun</button>
+                <button onclick="irParaMes(6)">Jul</button>
+                <button onclick="irParaMes(7)">Ago</button>
+                <button onclick="irParaMes(8)">Set</button>
+                <button onclick="irParaMes(9)">Out</button>
+                <button onclick="irParaMes(10)">Nov</button>
+                <button onclick="irParaMes(11)">Dez</button>
+            </div>
+        </div>
+
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="mostrarAba('dashboard')">Dashboard</button>
+            <button class="tab-button" onclick="mostrarAba('receitas')">Receitas</button>
+            <button class="tab-button" onclick="mostrarAba('despesas')">Despesas</button>
+            <button class="tab-button" onclick="mostrarAba('trading')">Day Trading</button>
+            <button class="tab-button" onclick="mostrarAba('resumo')">Resumo Anual</button>
+        </div>
+
+<div id="abaDashboard" class="tab-content active">
+    <div class="section">
+        <h2>Visão Geral do Mês</h2>
+        <div class="two-column">
+            <div class="column">
+                <h3>Receitas</h3>
+                <div class="balance">
+                    <div>Salário Líquido: R$ <span id="dashSalarioLiquido">0,00</span></div>
+                    <div>Aluguéis: R$ <span id="dashAluguel">0,00</span></div>
+                    <div>Outras Receitas: R$ <span id="dashOutrasReceitas">0,00</span></div>
+                    <div>Day Trading: R$ <span id="dashTrading">0,00</span></div>
+                    <div style="margin-top: 10px; font-weight: bold;">Total: R$ <span id="dashTotalReceitas">0,00</span></div>
+                </div>
+            </div>
+            <div class="column">
+                <h3>Despesas</h3>
+                <div class="balance">
+                    <div>Alimentação: R$ <span id="dashAlimentacao">0,00</span></div>
+                    <div>Cartão de Crédito: R$ <span id="dashCartao">0,00</span></div>
+                    <div>Despesas Fixas: R$ <span id="dashFixas">0,00</span></div>
+                    <div>Day Trading: R$ <span id="dashTradingDespesa">0,00</span></div>
+                    <div>Outras Despesas: R$ <span id="dashOutrasDespesas">0,00</span></div>
+                    <div style="margin-top: 10px; font-weight: bold;">Total: R$ <span id="dashTotalDespesas">0,00</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="balance">
+            <strong>Saldo Final: R$ <span id="saldoFinal">0,00</span></strong>
+            <div style="font-size: 14px; margin-top: 5px;">
+                (Total Receitas - Total Despesas)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="abaReceitas" class="tab-content">
+    <div class="section">
+        <h2>Contracheque</h2>
+        <div class="two-column">
+            <div class="column">
+                <h3>Créditos</h3>
+                <form id="creditoForm">
+                    <div class="form-row">
+                        <input type="text" id="creditoDescricao" placeholder="Descrição" required>
+                        <input type="number" id="creditoValor" placeholder="Valor" step="0.01" required>
+                        <input type="submit" value="Adicionar">
+                    </div>
+                </form>
+                <div class="table-container">
+                    <table id="creditosTable">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th class="acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="total">Total Créditos: R$ <span id="totalCreditos">0,00</span></div>
+            </div>
+
+            <div class="column">
+                <h3>Descontos</h3>
+                <form id="descontoForm">
+                    <div class="form-row">
+                        <input type="text" id="descontoDescricao" placeholder="Descrição" required>
+                        <input type="number" id="descontoValor" placeholder="Valor" step="0.01" required>
+                        <input type="submit" value="Adicionar">
+                    </div>
+                </form>
+                <div class="table-container">
+                    <table id="descontosTable">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th class="acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="total">Total Descontos: R$ <span id="totalDescontos">0,00</span></div>
+            </div>
+        </div>
+        <div class="balance">
+            <strong>Salário Líquido: R$ <span id="salarioLiquido">0,00</span></strong>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Aluguéis</h2>
+        <div class="two-column">
+            <div class="column">
+                <h3>Receitas</h3>
+                <form id="aluguelReceitaForm">
+                    <div class="form-row">
+                        <input type="text" id="aluguelReceitaDescricao" placeholder="Descrição (ex: Apto Centro)" required>
+                        <input type="number" id="aluguelReceitaValor" placeholder="Valor" step="0.01" required>
+                        <input type="date" id="aluguelReceitaInicio" placeholder="Início do Contrato" required>
+                        <input type="date" id="aluguelReceitaFim" placeholder="Fim do Contrato" required>
+                        <input type="submit" value="Adicionar">
+                    </div>
+                </form>
+                <div class="table-container">
+                    <table id="aluguelReceitasTable">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                                <th class="acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="total">Total Receitas: R$ <span id="totalAluguelReceitas">0,00</span></div>
+            </div>
+
+            <div class="column">
+                <h3>Despesas</h3>
+                <form id="aluguelDespesaForm">
+                    <div class="form-row">
+                        <input type="text" id="aluguelDespesaDescricao" placeholder="Descrição (ex: Manutenção)" required>
+                        <input type="number" id="aluguelDespesaValor" placeholder="Valor" step="0.01" required>
+                        <input type="date" id="aluguelDespesaInicio" placeholder="Início do Contrato" required>
+                        <input type="date" id="aluguelDespesaFim" placeholder="Fim do Contrato" required>
+                        <input type="submit" value="Adicionar">
+                    </div>
+                </form>
+                <div class="table-container">
+                    <table id="aluguelDespesasTable">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                                <th class="acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="total">Total Despesas: R$ <span id="totalAluguelDespesas">0,00</span></div>
+            </div>
+        </div>
+        <div class="balance">
+            <strong>Resultado Aluguéis: R$ <span id="resultadoAluguel">0,00</span></strong>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Outras Receitas</h2>
+        <form id="receitaForm">
+            <div class="form-row">
+                <input type="text" id="receitaDescricao" placeholder="Descrição" required>
+                <input type="number" id="receitaValor" placeholder="Valor" step="0.01" required>
+                <select id="receitaCategoria">
+                    <option value="Salário">Salário</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Investimentos">Investimentos</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <input type="submit" value="Adicionar">
+            </div>
+        </form>
+        <div class="table-container">
+            <table id="receitasTable">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Categoria</th>
+                        <th class="acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="total">Total Outras Receitas: R$ <span id="totalReceitas">0,00</span></div>
+    </div>
+</div>
+
+<div id="abaDespesas" class="tab-content">
+    <div class="section">
+        <h2>Despesas Gerais</h2>
+        <form id="despesaForm">
+            <div class="form-row">
+                <input type="text" id="despesaDescricao" placeholder="Descrição" required>
+                <input type="number" id="despesaValor" placeholder="Valor" step="0.01" required>
+                <select id="despesaCategoria">
+                    <option value="Alimentação">Alimentação</option>
+                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                    <option value="Despesas Fixas">Despesas Fixas</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Moradia">Moradia</option>
+                    <option value="Saúde">Saúde</option>
+                    <option value="Educação">Educação</option>
+                    <option value="Lazer">Lazer</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <input type="submit" value="Adicionar">
+            </div>
+        </form>
+        <div class="table-container">
+            <table id="despesasTable">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Categoria</th>
+                        <th class="acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="total">Total Despesas: R$ <span id="totalDespesas">0,00</span></div>
+    </div>
+</div>
+
+<div id="abaTrading" class="tab-content">
+    <div class="section">
+        <h2>Day Trading</h2>
+        <div class="two-column">
+            <div class="column">
+                <h3>Ganhos</h3>
+                <form id="tradingGanhoForm">
+                    <div class="form-row">
+                        <input type="text" id="tradingGanhoDescricao" placeholder="Descrição (ex: PETR4)" required>
+                        <input type="number" id="tradingGanhoValor" placeholder="Valor" step="0.01" required>
+                        <input type="submit" value="Adicionar">
+                    </div>
+                </form>
+                <div class="table-container">
+                    <table id="tradingGanhosTable">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th class="acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="total">Total Ganhos: R$ <span id="totalTradingGanhos">0,00</span></div>
+            </div>
+
+            <div class="column">
+                <h3>Perdas</h3>
+                <form id="tradingPerdaForm">
+                    <div class="form-row">
+                        <input type="text" id="tradingPerdaDescricao" placeholder="Descrição (ex: MGLU3)" required>
+                        <input type="number" id="tradingPerdaValor" placeholder="Valor" step="0.01" required>
+                        <input type="submit" value="Adicionar">
+                    </div>
+                </form>
+                <div class="table-container">
+                    <table id="tradingPerdasTable">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th class="acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="total">Total Perdas: R$ <span id="totalTradingPerdas">0,00</span></div>
+            </div>
+        </div>
+        <div class="balance">
+            <strong>Resultado Trading: R$ <span id="resultadoTrading">0,00</span></strong>
+        </div>
+    </div>
+</div>
+
+<div id="abaResumo" class="tab-content">
+    <div class="resumo-anual">
+        <h2>Resumo Anual - <span id="anoResumo">2025</span></h2>
+        <div class="resumo-grid" id="resumoGrid">
+            <!-- Cards de resumo serão inseridos aqui -->
+        </div>
+    </div>
+</div>
+
+
+<div class="export-import">
+    <h2>Backup e Restauração</h2>
+            <div class="export-buttons">
+                <button onclick="exportarExcel()">📊 Exportar Excel (.xlsx)</button>
+                <button onclick="exportarODS()">📋 Exportar ODS (.ods)</button>
+                <button onclick="exportarCSV()">📄 Exportar CSV</button>
+                <button onclick="limparMes()">🗑️ Limpar Mês Atual</button>
+                <button onclick="limparAno()">🗑️ Limpar Ano Todo</button>
+            </div>
+
+            <div class="file-input">
+                <label for="excelFile">📂 Importar planilha (Excel/ODS/CSV):</label>
+                <input type="file" id="excelFile" accept=".xlsx,.xls,.ods,.csv" onchange="importarArquivo(event)">
+            </div>
+
+            <div id="statusMessage"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        class OrcamentoMensal {
+            constructor() {
+                this.mesAtual = new Date().getMonth();
+                this.anoAtual = new Date().getFullYear();
+                this.dados = {}; // {ano: {mes: {receitas: [], despesas: [], ...}}}
+                this.proximoId = 1;
+                this.editandoId = null;
+                this.mesesNomes = [
+                    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+                ];
+
+                this.carregarDados();
+                this.inicializarEventos();
+                this.atualizarInterface();
+                this.atualizarMesAtual();
+            }
+
+            inicializarEventos() {
+                const forms = [
+                    'receitaForm', 'despesaForm', 'creditoForm', 'descontoForm',
+                    'tradingGanhoForm', 'tradingPerdaForm', 'aluguelReceitaForm', 'aluguelDespesaForm'
+                ];
+
+                forms.forEach(formId => {
+                    document.getElementById(formId).addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.adicionarItem(formId);
+                    });
+                });
+            }
+
+            obterDadosMes() {
+                if (!this.dados[this.anoAtual]) {
+                    this.dados[this.anoAtual] = {};
+                }
+                if (!this.dados[this.anoAtual][this.mesAtual]) {
+                    this.dados[this.anoAtual][this.mesAtual] = {
+                        receitas: [],
+                        despesas: [],
+                        creditos: [],
+                        descontos: [],
+                        tradingGanhos: [],
+                        tradingPerdas: [],
+                        aluguelReceitas: [],
+                        aluguelDespesas: []
+                    };
+                }
+                return this.dados[this.anoAtual][this.mesAtual];
+            }
+
+            adicionarItem(formId) {
+                const dadosMes = this.obterDadosMes();
+                let item = { id: this.proximoId++ };
+
+                switch (formId) {
+                    case 'creditoForm':
+                        item.descricao = document.getElementById('creditoDescricao').value;
+                        item.valor = parseFloat(document.getElementById('creditoValor').value);
+                        item.tipo = 'credito';
+                        dadosMes.creditos.push(item);
+                        break;
+                    case 'descontoForm':
+                        item.descricao = document.getElementById('descontoDescricao').value;
+                        item.valor = parseFloat(document.getElementById('descontoValor').value);
+                        item.tipo = 'desconto';
+                        dadosMes.descontos.push(item);
+                        break;
+                    case 'tradingGanhoForm':
+                        item.descricao = document.getElementById('tradingGanhoDescricao').value;
+                        item.valor = parseFloat(document.getElementById('tradingGanhoValor').value);
+                        item.tipo = 'tradingGanho';
+                        dadosMes.tradingGanhos.push(item);
+                        break;
+                    case 'tradingPerdaForm':
+                        item.descricao = document.getElementById('tradingPerdaDescricao').value;
+                        item.valor = parseFloat(document.getElementById('tradingPerdaValor').value);
+                        item.tipo = 'tradingPerda';
+                        dadosMes.tradingPerdas.push(item);
+                        break;
+                    case 'aluguelReceitaForm':
+                        item.descricao = document.getElementById('aluguelReceitaDescricao').value;
+                        item.valor = parseFloat(document.getElementById('aluguelReceitaValor').value);
+                        item.inicio = document.getElementById('aluguelReceitaInicio').value;
+                        item.fim = document.getElementById('aluguelReceitaFim').value;
+                        item.tipo = 'aluguelReceita';
+                        dadosMes.aluguelReceitas.push(item);
+                        break;
+                    case 'aluguelDespesaForm':
+                        item.descricao = document.getElementById('aluguelDespesaDescricao').value;
+                        item.valor = parseFloat(document.getElementById('aluguelDespesaValor').value);
+                        item.inicio = document.getElementById('aluguelDespesaInicio').value;
+                        item.fim = document.getElementById('aluguelDespesaFim').value;
+                        item.tipo = 'aluguelDespesa';
+                        dadosMes.aluguelDespesas.push(item);
+                        break;
+                    case 'receitaForm':
+                        item.descricao = document.getElementById('receitaDescricao').value;
+                        item.valor = parseFloat(document.getElementById('receitaValor').value);
+                        item.categoria = document.getElementById('receitaCategoria').value;
+                        item.tipo = 'receita';
+                        dadosMes.receitas.push(item);
+                        break;
+                    case 'despesaForm':
+                        item.descricao = document.getElementById('despesaDescricao').value;
+                        item.valor = parseFloat(document.getElementById('despesaValor').value);
+                        item.categoria = document.getElementById('despesaCategoria').value;
+                        item.tipo = 'despesa';
+                        dadosMes.despesas.push(item);
+                        break;
+                }
+
+                this.salvarDados();
+                this.atualizarInterface();
+                document.getElementById(formId).reset();
+                this.mostrarMensagem('Item adicionado com sucesso!', 'success');
+            }
+
+            removerItem(id, tipo) {
+                if (confirm('Tem certeza que deseja remover este item?')) {
+                    const dadosMes = this.obterDadosMes();
+
+                    switch (tipo) {
+                        case 'receita':
+                            dadosMes.receitas = dadosMes.receitas.filter(r => r.id !== id);
+                            break;
+                        case 'despesa':
+                            dadosMes.despesas = dadosMes.despesas.filter(d => d.id !== id);
+                            break;
+                        case 'credito':
+                            dadosMes.creditos = dadosMes.creditos.filter(c => c.id !== id);
+                            break;
+                        case 'desconto':
+                            dadosMes.descontos = dadosMes.descontos.filter(d => d.id !== id);
+                            break;
+                        case 'tradingGanho':
+                            dadosMes.tradingGanhos = dadosMes.tradingGanhos.filter(g => g.id !== id);
+                            break;
+                        case 'tradingPerda':
+                            dadosMes.tradingPerdas = dadosMes.tradingPerdas.filter(p => p.id !== id);
+                            break;
+                        case 'aluguelReceita':
+                            dadosMes.aluguelReceitas = dadosMes.aluguelReceitas.filter(r => r.id !== id);
+                            break;
+                        case 'aluguelDespesa':
+                            dadosMes.aluguelDespesas = dadosMes.aluguelDespesas.filter(d => d.id !== id);
+                            break;
+                    }
+
+                    this.salvarDados();
+                    this.atualizarInterface();
+                    this.mostrarMensagem('Item removido com sucesso!', 'success');
+                }
+            }
+
+            iniciarEdicao(id) {
+                this.editandoId = id;
+                this.atualizarInterface();
+            }
+
+            salvarEdicao(id) {
+                const novaDesc = document.getElementById('edit_desc_' + id).value;
+                const novoValor = parseFloat(document.getElementById('edit_valor_' + id).value);
+                const novaCatElement = document.getElementById('edit_cat_' + id);
+                const novoInicioElement = document.getElementById('edit_inicio_' + id);
+                const novoFimElement = document.getElementById('edit_fim_' + id);
+
+                let transacao = this.encontrarTransacao(id);
+
+                if (transacao) {
+                    transacao.descricao = novaDesc;
+                    transacao.valor = novoValor;
+                    if (novaCatElement) {
+                        transacao.categoria = novaCatElement.value;
+                    }
+                    if (novoInicioElement) {
+                        transacao.inicio = novoInicioElement.value;
+                    }
+                    if (novoFimElement) {
+                        transacao.fim = novoFimElement.value;
+                    }
+                    this.editandoId = null;
+                    this.salvarDados();
+                    this.atualizarInterface();
+                    this.mostrarMensagem('Item editado com sucesso!', 'success');
+                }
+            }
+
+            cancelarEdicao() {
+                this.editandoId = null;
+                this.atualizarInterface();
+            }
+
+            encontrarTransacao(id) {
+                const dadosMes = this.obterDadosMes();
+                return dadosMes.receitas.find(r => r.id === id) ||
+                       dadosMes.despesas.find(d => d.id === id) ||
+                       dadosMes.creditos.find(c => c.id === id) ||
+                       dadosMes.descontos.find(d => d.id === id) ||
+                       dadosMes.tradingGanhos.find(g => g.id === id) ||
+                       dadosMes.tradingPerdas.find(p => p.id === id) ||
+                       dadosMes.aluguelReceitas.find(r => r.id === id) ||
+                       dadosMes.aluguelDespesas.find(d => d.id === id);
+            }
+
+            atualizarInterface() {
+                const dadosMes = this.obterDadosMes();
+
+                this.atualizarTabelaComCategoria('receitasTable', dadosMes.receitas);
+                this.atualizarTabelaComCategoria('despesasTable', dadosMes.despesas);
+                this.atualizarTabelaSimples('creditosTable', dadosMes.creditos);
+                this.atualizarTabelaSimples('descontosTable', dadosMes.descontos);
+                this.atualizarTabelaSimples('tradingGanhosTable', dadosMes.tradingGanhos);
+                this.atualizarTabelaSimples('tradingPerdasTable', dadosMes.tradingPerdas);
+                this.atualizarTabelaSimples('aluguelReceitasTable', dadosMes.aluguelReceitas);
+                this.atualizarTabelaSimples('aluguelDespesasTable', dadosMes.aluguelDespesas);
+                this.atualizarTotais();
+                this.atualizarResumoAnual();
+            }
+
+            atualizarTabelaComCategoria(tabelaId, transacoes) {
+                const tbody = document.querySelector('#' + tabelaId + ' tbody');
+                tbody.innerHTML = '';
+
+                transacoes.forEach(transacao => {
+                    const row = tbody.insertRow();
+                    const cellDesc = row.insertCell(0);
+                    const cellValor = row.insertCell(1);
+                    const cellCat = row.insertCell(2);
+                    const cellAcao = row.insertCell(3);
+
+                    if (this.editandoId === transacao.id) {
+                        row.className = 'editando';
+                        cellDesc.innerHTML = `<input type="text" value="${transacao.descricao}" id="edit_desc_${transacao.id}" class="edit-input">`;
+                        cellValor.innerHTML = `<input type="number" value="${transacao.valor}" step="0.01" id="edit_valor_${transacao.id}" class="edit-input">`;
+
+                        const opcoes = transacao.tipo === 'receita' ?
+                            ['Salário', 'Freelance', 'Investimentos', 'Outros'] :
+                            ['Alimentação', 'Transporte', 'Moradia', 'Saúde', 'Educação', 'Lazer', 'Outros'];
+
+                        let selectHtml = `<select id="edit_cat_${transacao.id}" class="edit-input">`;
+                        opcoes.forEach(opcao => {
+                            const selected = opcao === transacao.categoria ? 'selected' : '';
+                            selectHtml += `<option value="${opcao}" ${selected}>${opcao}</option>`;
+                        });
+                        selectHtml += '</select>';
+                        cellCat.innerHTML = selectHtml;
+
+                        cellAcao.innerHTML = `
+                            <button class="btn" onclick="orcamento.salvarEdicao(${transacao.id})">Salvar</button>
+                            <button class="btn" onclick="orcamento.cancelarEdicao()">Cancelar</button>
+                        `;
+                    } else {
+                        cellDesc.textContent = transacao.descricao;
+                        cellValor.textContent = this.formatarMoeda(transacao.valor);
+                        cellCat.textContent = transacao.categoria;
+                        cellAcao.innerHTML = `
+                            <button class="btn" onclick="orcamento.iniciarEdicao(${transacao.id})">Editar</button>
+                            <button class="btn" onclick="orcamento.removerItem(${transacao.id}, '${transacao.tipo}')">Excluir</button>
+                        `;
+                    }
+                });
+            }
+            atualizarTabelaSimples(tabelaId, transacoes) {
+                const tbody = document.querySelector('#' + tabelaId + ' tbody');
+                tbody.innerHTML = '';
+                transacoes.forEach(transacao => {
+                    const row = tbody.insertRow();
+                    const cellDesc = row.insertCell(0);
+                    const cellValor = row.insertCell(1);
+
+                    // Verificar se é tabela de aluguel (tem datas)
+                    const isAluguel = tabelaId.includes('aluguel');
+                    let cellInicio, cellFim, cellAcao;
+
+                    if (isAluguel) {
+                        cellInicio = row.insertCell(2);
+                        cellFim = row.insertCell(3);
+                        cellAcao = row.insertCell(4);
+                    } else {
+                        cellAcao = row.insertCell(2);
+                    }
+
+                    if (this.editandoId === transacao.id) {
+                        row.className = 'editando';
+                        cellDesc.innerHTML = `<input type="text" value="${transacao.descricao}" id="edit_desc_${transacao.id}" class="edit-input">`;
+                        cellValor.innerHTML = `<input type="number" value="${transacao.valor}" step="0.01" id="edit_valor_${transacao.id}" class="edit-input">`;
+
+                        if (isAluguel) {
+                            cellInicio.innerHTML = `<input type="date" value="${transacao.inicio || ''}" id="edit_inicio_${transacao.id}" class="edit-input">`;
+                            cellFim.innerHTML = `<input type="date" value="${transacao.fim || ''}" id="edit_fim_${transacao.id}" class="edit-input">`;
+                        }
+
+                        cellAcao.innerHTML = `
+                            <button class="btn" onclick="orcamento.salvarEdicao(${transacao.id})">Salvar</button>
+                            <button class="btn" onclick="orcamento.cancelarEdicao()">Cancelar</button>
+                        `;
+                    } else {
+                        cellDesc.textContent = transacao.descricao;
+                        cellValor.textContent = this.formatarMoeda(transacao.valor);
+
+                        if (isAluguel) {
+                            cellInicio.textContent = transacao.inicio ? this.formatarData(transacao.inicio) : '-';
+                            cellFim.textContent = transacao.fim ? this.formatarData(transacao.fim) : '-';
+                        }
+
+                        cellAcao.innerHTML = `
+                            <button class="btn" onclick="orcamento.iniciarEdicao(${transacao.id})">Editar</button>
+                            <button class="btn" onclick="orcamento.removerItem(${transacao.id}, '${transacao.tipo}')">Excluir</button>
+                        `;
+                    }
+                });
+            }
+           atualizarTotais() {
+   const dadosMes = this.obterDadosMes();
+
+   const totalReceitas = dadosMes.receitas.reduce((sum, r) => sum + r.valor, 0);
+   const totalDespesas = dadosMes.despesas.reduce((sum, d) => sum + d.valor, 0);
+   const totalCreditos = dadosMes.creditos.reduce((sum, c) => sum + c.valor, 0);
+   const totalDescontos = dadosMes.descontos.reduce((sum, d) => sum + d.valor, 0);
+   const totalTradingGanhos = dadosMes.tradingGanhos.reduce((sum, g) => sum + g.valor, 0);
+   const totalTradingPerdas = dadosMes.tradingPerdas.reduce((sum, p) => sum + p.valor, 0);
+   const totalAluguelReceitas = dadosMes.aluguelReceitas.reduce((sum, r) => sum + r.valor, 0);
+   const totalAluguelDespesas = dadosMes.aluguelDespesas.reduce((sum, d) => sum + d.valor, 0);
+
+   const salarioLiquido = totalCreditos - totalDescontos;
+   const resultadoTrading = totalTradingGanhos - totalTradingPerdas;
+   const resultadoAluguel = totalAluguelReceitas - totalAluguelDespesas;
+   const saldoFinal = salarioLiquido + resultadoTrading + resultadoAluguel + totalReceitas - totalDespesas;
+
+   // Cálculos para categorias de despesas do Dashboard
+   const despesasAlimentacao = dadosMes.despesas.filter(d => d.categoria === 'Alimentação').reduce((sum, d) => sum + d.valor, 0);
+   const despesasCartao = dadosMes.despesas.filter(d => d.categoria === 'Cartão de Crédito').reduce((sum, d) => sum + d.valor, 0);
+   const despesasFixas = dadosMes.despesas.filter(d => d.categoria === 'Despesas Fixas').reduce((sum, d) => sum + d.valor, 0);
+   const outrasDesp = dadosMes.despesas.filter(d => !['Alimentação', 'Cartão de Crédito', 'Despesas Fixas'].includes(d.categoria)).reduce((sum, d) => sum + d.valor, 0);
+
+   // Atualizar elementos
+   document.getElementById('totalReceitas').textContent = this.formatarMoeda(totalReceitas);
+   document.getElementById('totalDespesas').textContent = this.formatarMoeda(totalDespesas);
+   document.getElementById('totalCreditos').textContent = this.formatarMoeda(totalCreditos);
+   document.getElementById('totalDescontos').textContent = this.formatarMoeda(totalDescontos);
+   document.getElementById('totalTradingGanhos').textContent = this.formatarMoeda(totalTradingGanhos);
+   document.getElementById('totalTradingPerdas').textContent = this.formatarMoeda(totalTradingPerdas);
+   document.getElementById('totalAluguelReceitas').textContent = this.formatarMoeda(totalAluguelReceitas);
+   document.getElementById('totalAluguelDespesas').textContent = this.formatarMoeda(totalAluguelDespesas);
+
+   this.atualizarElementoComCor('salarioLiquido', salarioLiquido);
+   this.atualizarElementoComCor('resultadoTrading', resultadoTrading);
+   this.atualizarElementoComCor('resultadoAluguel', resultadoAluguel);
+   this.atualizarElementoComCor('saldoFinal', saldoFinal);
+
+ // Atualizar Dashboard
+if (document.getElementById('dashSalarioLiquido')) {
+   this.atualizarElementoComCor('dashSalarioLiquido', salarioLiquido);
+   this.atualizarElementoComCor('dashAluguel', resultadoAluguel);
+   this.atualizarElementoComCor('dashOutrasReceitas', totalReceitas);
+
+   // Day Trading: só mostra se for positivo, senão mostra zero
+   const tradingParaDash = resultadoTrading > 0 ? resultadoTrading : 0;
+   this.atualizarElementoComCor('dashTrading', tradingParaDash);
+
+   const totalReceitasDash = salarioLiquido + resultadoAluguel + totalReceitas + tradingParaDash;
+   this.atualizarElementoComCor('dashTotalReceitas', totalReceitasDash);
+
+   document.getElementById('dashAlimentacao').textContent = this.formatarMoeda(despesasAlimentacao);
+   document.getElementById('dashCartao').textContent = this.formatarMoeda(despesasCartao);
+   document.getElementById('dashFixas').textContent = this.formatarMoeda(despesasFixas);
+
+   // Day Trading negativo aparece em despesas
+   const tradingDespesa = resultadoTrading < 0 ? Math.abs(resultadoTrading) : 0;
+   document.getElementById('dashTradingDespesa').textContent = this.formatarMoeda(tradingDespesa);
+
+   document.getElementById('dashOutrasDespesas').textContent = this.formatarMoeda(outrasDesp);
+
+   const totalDespesasDash = totalDespesas + tradingDespesa;
+   document.getElementById('dashTotalDespesas').textContent = this.formatarMoeda(totalDespesasDash);
+}
+}
+
+atualizarElementoComCor(elementId, valor) {
+   const element = document.getElementById(elementId);
+   element.textContent = this.formatarMoeda(valor);
+   element.className = valor >= 0 ? 'positive' : 'negative';
+}
+
+atualizarMesAtual() {
+   document.getElementById('mesAtual').textContent = `${this.mesesNomes[this.mesAtual]} ${this.anoAtual}`;
+   document.getElementById('anoResumo').textContent = this.anoAtual;
+
+   // Atualizar botões de navegação rápida
+   document.querySelectorAll('.quick-nav button').forEach((btn, index) => {
+       btn.classList.toggle('active', index === this.mesAtual);
+   });
+}
+
+atualizarResumoAnual() {
+   const grid = document.getElementById('resumoGrid');
+   grid.innerHTML = '';
+   for (let mes = 0; mes < 12; mes++) {
+       const dadosMes = this.dados[this.anoAtual]?.[mes] || this.obterDadosVazios();
+       const totais = this.calcularTotaisMes(dadosMes);
+       const card = document.createElement('div');
+       card.className = 'resumo-card';
+       card.innerHTML = `
+           <h4>${this.mesesNomes[mes]}</h4>
+           <div>Saldo: <span class="${totais.saldoFinal >= 0 ? 'positive' : 'negative'}">${this.formatarMoeda(totais.saldoFinal)}</span></div>
+           <div style="font-size: 12px; margin-top: 5px;">
+               Receitas: ${this.formatarMoeda(totais.totalReceitas)}<br>
+               Despesas: ${this.formatarMoeda(totais.totalDespesas)}
+           </div>
+       `;
+       card.onclick = () => {
+           this.mesAtual = mes;
+           this.atualizarMesAtual();
+           this.atualizarInterface();
+           mostrarAba('dashboard');
+       };
+       grid.appendChild(card);
+   }
+   // Card de totais anuais
+                const totaisAnuais = this.calcularTotaisAnuais();
+                const cardAnual = document.createElement('div');
+                cardAnual.className = 'resumo-card';
+                cardAnual.style.gridColumn = 'span 2';
+                cardAnual.style.backgroundColor = '#c0c2bd';
+                cardAnual.innerHTML = `
+                    <h3>TOTAL ANUAL</h3>
+                    <div><strong>Saldo: <span class="${totaisAnuais.saldoFinal >= 0 ? 'positive' : 'negative'}">${this.formatarMoeda(totaisAnuais.saldoFinal)}</span></strong></div>
+                    <div style="margin-top: 10px;">
+                        Total Receitas: ${this.formatarMoeda(totaisAnuais.totalReceitas)}<br>
+                        Total Despesas: ${this.formatarMoeda(totaisAnuais.totalDespesas)}
+                    </div>
+                `;
+                grid.appendChild(cardAnual);
+            }
+
+            obterDadosVazios() {
+                return {
+                    receitas: [],
+                    despesas: [],
+                    creditos: [],
+                    descontos: [],
+                    tradingGanhos: [],
+                    tradingPerdas: [],
+                    aluguelReceitas: [],
+                    aluguelDespesas: []
+                };
+            }
+
+            calcularTotaisMes(dadosMes) {
+                const totalReceitas = dadosMes.receitas.reduce((sum, r) => sum + r.valor, 0);
+                const totalDespesas = dadosMes.despesas.reduce((sum, d) => sum + d.valor, 0);
+                const totalCreditos = dadosMes.creditos.reduce((sum, c) => sum + c.valor, 0);
+                const totalDescontos = dadosMes.descontos.reduce((sum, d) => sum + d.valor, 0);
+                const totalTradingGanhos = dadosMes.tradingGanhos.reduce((sum, g) => sum + g.valor, 0);
+                const totalTradingPerdas = dadosMes.tradingPerdas.reduce((sum, p) => sum + p.valor, 0);
+                const totalAluguelReceitas = dadosMes.aluguelReceitas.reduce((sum, r) => sum + r.valor, 0);
+                const totalAluguelDespesas = dadosMes.aluguelDespesas.reduce((sum, d) => sum + d.valor, 0);
+
+                const salarioLiquido = totalCreditos - totalDescontos;
+                const resultadoTrading = totalTradingGanhos - totalTradingPerdas;
+                const resultadoAluguel = totalAluguelReceitas - totalAluguelDespesas;
+                const saldoFinal = salarioLiquido + resultadoTrading + resultadoAluguel + totalReceitas - totalDespesas;
+
+                return {
+                    totalReceitas: totalReceitas + totalCreditos + totalTradingGanhos + totalAluguelReceitas,
+                    totalDespesas: totalDespesas + totalDescontos + totalTradingPerdas + totalAluguelDespesas,
+                    salarioLiquido,
+                    resultadoTrading,
+                    resultadoAluguel,
+                    saldoFinal
+                };
+            }
+
+            calcularTotaisAnuais() {
+                let totaisAnuais = {
+                    totalReceitas: 0,
+                    totalDespesas: 0,
+                    saldoFinal: 0
+                };
+
+                for (let mes = 0; mes < 12; mes++) {
+                    const dadosMes = this.dados[this.anoAtual]?.[mes] || this.obterDadosVazios();
+                    const totaisMes = this.calcularTotaisMes(dadosMes);
+
+                    totaisAnuais.totalReceitas += totaisMes.totalReceitas;
+                    totaisAnuais.totalDespesas += totaisMes.totalDespesas;
+                    totaisAnuais.saldoFinal += totaisMes.saldoFinal;
+                }
+
+                return totaisAnuais;
+            }
+            formatarMoeda(valor) {
+                return valor.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            formatarData(data) {
+                if (!data) return '-';
+                const partes = data.split('-');
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+
+            mostrarMensagem(mensagem, tipo) {
+                const statusDiv = document.getElementById('statusMessage');
+                statusDiv.textContent = mensagem;
+                statusDiv.className = 'status-message ' + tipo;
+                setTimeout(() => {
+                    statusDiv.textContent = '';
+                    statusDiv.className = '';
+                }, 3000);
+            }
+
+            salvarDados() {
+                try {
+                    localStorage.setItem('orcamentoMensal', JSON.stringify({
+                        dados: this.dados,
+                        proximoId: this.proximoId
+                    }));
+                } catch (error) {
+                    console.error('Erro ao salvar dados:', error);
+                    this.mostrarMensagem('Erro ao salvar dados localmente', 'error');
+                }
+            }
+
+            carregarDados() {
+                try {
+                    const dadosSalvos = JSON.parse(localStorage.getItem('orcamentoMensal'));
+                    if (dadosSalvos) {
+                        this.dados = dadosSalvos.dados || {};
+                        this.proximoId = dadosSalvos.proximoId || 1;
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    this.mostrarMensagem('Erro ao carregar dados salvos', 'error');
+                }
+            }
+
+            exportarParaExcel() {
+                const wb = XLSX.utils.book_new();
+
+                // Aba de resumo anual
+                const dadosResumo = [['Mês', 'Receitas Totais', 'Despesas Totais', 'Saldo Final']];
+
+                for (let mes = 0; mes < 12; mes++) {
+                    const dadosMes = this.dados[this.anoAtual]?.[mes] || this.obterDadosVazios();
+                    const totais = this.calcularTotaisMes(dadosMes);
+                    dadosResumo.push([
+                        this.mesesNomes[mes],
+                        totais.totalReceitas,
+                        totais.totalDespesas,
+                        totais.saldoFinal
+                    ]);
+                }
+
+                const totaisAnuais = this.calcularTotaisAnuais();
+                dadosResumo.push([
+                    'TOTAL ANUAL',
+                    totaisAnuais.totalReceitas,
+                    totaisAnuais.totalDespesas,
+                    totaisAnuais.saldoFinal
+                ]);
+
+                const wsResumo = XLSX.utils.aoa_to_sheet(dadosResumo);
+                XLSX.utils.book_append_sheet(wb, wsResumo, `Resumo ${this.anoAtual}`);
+
+                // Abas mensais com dados
+                for (let mes = 0; mes < 12; mes++) {
+                    const dadosMes = this.dados[this.anoAtual]?.[mes];
+                    if (dadosMes && this.temDados(dadosMes)) {
+                        const dadosPlanilha = this.criarDadosPlanilhaMes(dadosMes);
+                        const ws = XLSX.utils.aoa_to_sheet(dadosPlanilha);
+                        XLSX.utils.book_append_sheet(wb, ws, this.mesesNomes[mes]);
+                    }
+                }
+
+                return wb;
+            }
+
+            temDados(dadosMes) {
+                return dadosMes.receitas.length > 0 || dadosMes.despesas.length > 0 ||
+                       dadosMes.creditos.length > 0 || dadosMes.descontos.length > 0 ||
+                       dadosMes.tradingGanhos.length > 0 || dadosMes.tradingPerdas.length > 0 ||
+                       dadosMes.aluguelReceitas.length > 0 || dadosMes.aluguelDespesas.length > 0;
+            }
+            criarDadosPlanilhaMes(dadosMes) {
+                const dados = [['Tipo', 'Descrição', 'Valor', 'Categoria', 'Início', 'Fim']];
+                // Adicionar todos os tipos de dados
+                dadosMes.creditos.forEach(item => {
+                    dados.push(['Crédito', item.descricao, item.valor, 'Contracheque']);
+                });
+
+                dadosMes.descontos.forEach(item => {
+                    dados.push(['Desconto', item.descricao, item.valor, 'Contracheque']);
+                });
+
+                dadosMes.tradingGanhos.forEach(item => {
+                    dados.push(['Trading Ganho', item.descricao, item.valor, 'Day Trading']);
+                });
+
+                dadosMes.tradingPerdas.forEach(item => {
+                    dados.push(['Trading Perda', item.descricao, item.valor, 'Day Trading']);
+                });
+                dadosMes.aluguelReceitas.forEach(item => {
+                    dados.push(['Aluguel Receita', item.descricao, item.valor, 'Aluguéis', item.inicio || '', item.fim || '']);
+                });
+                dadosMes.aluguelDespesas.forEach(item => {
+                    dados.push(['Aluguel Despesa', item.descricao, item.valor, 'Aluguéis', item.inicio || '', item.fim || '']);
+                });
+                dadosMes.receitas.forEach(item => {
+                    dados.push(['Receita', item.descricao, item.valor, item.categoria]);
+                });
+
+                dadosMes.despesas.forEach(item => {
+                    dados.push(['Despesa', item.descricao, item.valor, item.categoria]);
+                });
+
+                // Adicionar totais
+                const totais = this.calcularTotaisMes(dadosMes);
+                dados.push(['', '', '', '']);
+                dados.push(['RESUMO', '', '', '']);
+                dados.push(['Total Receitas', '', totais.totalReceitas, '']);
+                dados.push(['Total Despesas', '', totais.totalDespesas, '']);
+                dados.push(['Saldo Final', '', totais.saldoFinal, '']);
+
+                return dados;
+            }
+
+            importarDados(arquivo) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+
+                        if (confirm('Importar arquivo irá substituir todos os dados do ano atual. Deseja continuar?')) {
+                            this.processarImportacao(workbook);
+                        }
+                    } catch (error) {
+                        console.error('Erro ao importar:', error);
+                        this.mostrarMensagem('Erro ao importar arquivo. Verifique o formato.', 'error');
+                    }
+                };
+                reader.readAsArrayBuffer(arquivo);
+            }
+
+            processarImportacao(workbook) {
+                // Limpar dados do ano atual
+                this.dados[this.anoAtual] = {};
+                let itensImportados = 0;
+
+                workbook.SheetNames.forEach(sheetName => {
+                    if (sheetName.startsWith('Resumo')) return; // Pular aba de resumo
+
+                    const mesIndex = this.mesesNomes.indexOf(sheetName);
+                    if (mesIndex !== -1) {
+                        const worksheet = workbook.Sheets[sheetName];
+                        const dados = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                        itensImportados += this.importarDadosMes(dados, mesIndex);
+                    }
+                });
+
+                this.salvarDados();
+                this.atualizarInterface();
+                this.mostrarMensagem(`Dados importados com sucesso! ${itensImportados} itens importados.`, 'success');
+            }
+
+            importarDadosMes(dados, mesIndex) {
+                const dadosMes = this.obterDadosVaziosPorMes(mesIndex);
+                let contador = 0;
+                for (let i = 1; i < dados.length; i++) {
+                    const linha = dados[i];
+                    if (!linha || linha.length < 3 || linha[0] === 'RESUMO' || linha[0] === '') break;
+                    const [tipo, descricao, valor, categoria, inicio, fim] = linha;
+                    if (descricao && !isNaN(parseFloat(valor))) {
+                        const item = {
+                            id: this.proximoId++,
+                            descricao: descricao,
+                            valor: parseFloat(valor)
+                        };
+
+                        if (categoria && ['Salário', 'Freelance', 'Investimentos', 'Alimentação', 'Transporte', 'Moradia', 'Saúde', 'Educação', 'Lazer', 'Outros'].includes(categoria)) {
+                            item.categoria = categoria;
+                        }
+
+                        switch (tipo) {
+                            case 'Crédito':
+                                item.tipo = 'credito';
+                                dadosMes.creditos.push(item);
+                                contador++;
+                                break;
+                            case 'Desconto':
+                                item.tipo = 'desconto';
+                                dadosMes.descontos.push(item);
+                                contador++;
+                                break;
+                            case 'Trading Ganho':
+                                item.tipo = 'tradingGanho';
+                                dadosMes.tradingGanhos.push(item);
+                                contador++;
+                                break;
+                            case 'Trading Perda':
+                                item.tipo = 'tradingPerda';
+                                dadosMes.tradingPerdas.push(item);
+                                contador++;
+                              break;
+                            case 'Aluguel Receita':
+                                item.tipo = 'aluguelReceita';
+                                if (inicio) item.inicio = inicio;
+                                if (fim) item.fim = fim;
+                                dadosMes.aluguelReceitas.push(item);
+                                contador++;
+                                break;
+                            case 'Aluguel Despesa':
+                                item.tipo = 'aluguelDespesa';
+                                if (inicio) item.inicio = inicio;
+                                if (fim) item.fim = fim;
+                                dadosMes.aluguelDespesas.push(item);
+                                contador++;
+                                break;
+                            case 'Receita':
+                                item.tipo = 'receita';
+                                item.categoria = categoria || 'Outros';
+                                dadosMes.receitas.push(item);
+                                contador++;
+                                break;
+                            case 'Despesa':
+                                item.tipo = 'despesa';
+                                item.categoria = categoria || 'Outros';
+                                dadosMes.despesas.push(item);
+                                contador++;
+                                break;
+                        }
+                    }
+                }
+
+                this.dados[this.anoAtual][mesIndex] = dadosMes;
+                return contador;
+            }
+
+            obterDadosVaziosPorMes(mes) {
+                if (!this.dados[this.anoAtual]) {
+                    this.dados[this.anoAtual] = {};
+                }
+                this.dados[this.anoAtual][mes] = this.obterDadosVazios();
+                return this.dados[this.anoAtual][mes];
+            }
+        }
+
+        // Inicializar o sistema
+        const orcamento = new OrcamentoMensal();
+
+        // Funções globais de navegação
+        function navegarMes(direcao) {
+            orcamento.mesAtual += direcao;
+
+            if (orcamento.mesAtual < 0) {
+                orcamento.mesAtual = 11;
+                orcamento.anoAtual--;
+            } else if (orcamento.mesAtual > 11) {
+                orcamento.mesAtual = 0;
+                orcamento.anoAtual++;
+            }
+
+            orcamento.atualizarMesAtual();
+            orcamento.atualizarInterface();
+        }
+
+        function irParaMes(mes) {
+   orcamento.mesAtual = mes;
+   orcamento.atualizarMesAtual();
+   orcamento.atualizarInterface();
+}
+
+function mostrarAba(aba) {
+   // Esconder todas as abas
+   document.querySelectorAll('.tab-content').forEach(content => {
+       content.classList.remove('active');
+   });
+
+   // Remover classe active dos botões
+   document.querySelectorAll('.tab-button').forEach(btn => {
+       btn.classList.remove('active');
+   });
+
+   // Mostrar aba selecionada
+   if (aba === 'dashboard') {
+       document.getElementById('abaDashboard').classList.add('active');
+       document.querySelectorAll('.tab-button')[0].classList.add('active');
+   } else if (aba === 'receitas') {
+       document.getElementById('abaReceitas').classList.add('active');
+       document.querySelectorAll('.tab-button')[1].classList.add('active');
+   } else if (aba === 'despesas') {
+       document.getElementById('abaDespesas').classList.add('active');
+       document.querySelectorAll('.tab-button')[2].classList.add('active');
+   } else if (aba === 'trading') {
+       document.getElementById('abaTrading').classList.add('active');
+       document.querySelectorAll('.tab-button')[3].classList.add('active');
+   } else if (aba === 'resumo') {
+       document.getElementById('abaResumo').classList.add('active');
+       document.querySelectorAll('.tab-button')[4].classList.add('active');
+       orcamento.atualizarResumoAnual();
+   }
+}
+
+// Funções de exportação e importação
+        function exportarExcel() {
+            try {
+                const wb = orcamento.exportarParaExcel();
+                XLSX.writeFile(wb, `orcamento_${orcamento.anoAtual}.xlsx`);
+                orcamento.mostrarMensagem('Arquivo Excel exportado com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao exportar Excel:', error);
+                orcamento.mostrarMensagem('Erro ao exportar arquivo Excel', 'error');
+            }
+        }
+
+        function exportarODS() {
+            try {
+                const wb = orcamento.exportarParaExcel();
+                XLSX.writeFile(wb, `orcamento_${orcamento.anoAtual}.ods`);
+                orcamento.mostrarMensagem('Arquivo ODS exportado com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao exportar ODS:', error);
+                orcamento.mostrarMensagem('Erro ao exportar arquivo ODS', 'error');
+            }
+        }
+
+        function exportarCSV() {
+            try {
+                const dadosMes = orcamento.obterDadosMes();
+                const dadosPlanilha = orcamento.criarDadosPlanilhaMes(dadosMes);
+
+                let csv = '';
+                dadosPlanilha.forEach(linha => {
+                    const linhaCSV = linha.map(celula => {
+                        if (typeof celula === 'string' && celula.includes(',')) {
+                            return `"${celula}"`;
+                        }
+                        return celula;
+                    }).join(',');
+                    csv += linhaCSV + '\n';
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `orcamento_${orcamento.mesesNomes[orcamento.mesAtual]}_${orcamento.anoAtual}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                orcamento.mostrarMensagem('Arquivo CSV exportado com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao exportar CSV:', error);
+                orcamento.mostrarMensagem('Erro ao exportar arquivo CSV', 'error');
+            }
+        }
+
+        function importarArquivo(event) {
+            const arquivo = event.target.files[0];
+            if (arquivo) {
+                const extensao = arquivo.name.split('.').pop().toLowerCase();
+
+                if (['xlsx', 'xls', 'ods'].includes(extensao)) {
+                    orcamento.importarDados(arquivo);
+                } else if (extensao === 'csv') {
+                    importarCSV(arquivo);
+                } else {
+                    orcamento.mostrarMensagem('Formato de arquivo não suportado. Use Excel (.xlsx), ODS (.ods) ou CSV (.csv)', 'error');
+                }
+            }
+        }
+
+        function importarCSV(arquivo) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const conteudo = e.target.result;
+                    const linhas = conteudo.split('\n');
+
+                    if (confirm('Importar CSV irá substituir todos os dados do mês atual. Deseja continuar?')) {
+                        const dadosMes = orcamento.obterDadosVazios();
+                        let contador = 0;
+
+                        for (let i = 1; i < linhas.length; i++) {
+                            const linha = linhas[i].trim();
+                           if (!linha || linha.startsWith('RESUMO')) break;
+                            const colunas = parseCSVLine(linha);
+                            if (colunas.length >= 3) {
+                                const tipo = colunas[0];
+                                const descricao = colunas[1].replace(/"/g, '');
+                                const valor = parseFloat(colunas[2]);
+                                const categoria = colunas[3] || '';
+                                const inicio = colunas[4] || '';
+                                const fim = colunas[5] || '';
+                                if (!isNaN(valor)) {
+                                    const item = {
+                                        id: orcamento.proximoId++,
+                                        descricao: descricao,
+                                        valor: valor
+                                    };
+
+                                    if (categoria && ['Salário', 'Freelance', 'Investimentos', 'Alimentação', 'Transporte', 'Moradia', 'Saúde', 'Educação', 'Lazer', 'Outros'].includes(categoria)) {
+                                        item.categoria = categoria;
+                                    }
+
+                                    switch (tipo) {
+                                        case 'Crédito':
+                                            item.tipo = 'credito';
+                                            dadosMes.creditos.push(item);
+                                            contador++;
+                                            break;
+                                        case 'Desconto':
+                                            item.tipo = 'desconto';
+                                            dadosMes.descontos.push(item);
+                                            contador++;
+                                            break;
+                                        case 'Trading Ganho':
+                                            item.tipo = 'tradingGanho';
+                                            dadosMes.tradingGanhos.push(item);
+                                            contador++;
+                                            break;
+                                        case 'Trading Perda':
+                                            item.tipo = 'tradingPerda';
+                                            dadosMes.tradingPerdas.push(item);
+                                            contador++;
+                                            break;
+                                        case 'Aluguel Receita':
+                                            item.tipo = 'aluguelReceita';
+                                            if (inicio) item.inicio = inicio;
+                                            if (fim) item.fim = fim;
+                                            dadosMes.aluguelReceitas.push(item);
+                                            contador++;
+                                            break;
+                                        case 'Aluguel Despesa':
+                                            item.tipo = 'aluguelDespesa';
+                                            if (inicio) item.inicio = inicio;
+                                            if (fim) item.fim = fim;
+                                            dadosMes.aluguelDespesas.push(item);
+                                            contador++;
+                                            break;
+                                        case 'Receita':
+                                            item.tipo = 'receita';
+                                            item.categoria = categoria || 'Outros';
+                                            dadosMes.receitas.push(item);
+                                            contador++;
+                                            break;
+                                        case 'Despesa':
+                                            item.tipo = 'despesa';
+                                            item.categoria = categoria || 'Outros';
+                                            dadosMes.despesas.push(item);
+                                            contador++;
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Substituir dados do mês atual
+                        if (!orcamento.dados[orcamento.anoAtual]) {
+                            orcamento.dados[orcamento.anoAtual] = {};
+                        }
+                        orcamento.dados[orcamento.anoAtual][orcamento.mesAtual] = dadosMes;
+
+                        orcamento.salvarDados();
+                        orcamento.atualizarInterface();
+                        orcamento.mostrarMensagem(`CSV importado com sucesso! ${contador} itens importados.`, 'success');
+                    }
+                } catch (error) {
+                    console.error('Erro ao importar CSV:', error);
+                    orcamento.mostrarMensagem('Erro ao importar arquivo CSV. Verifique o formato.', 'error');
+                }
+            };
+            reader.readAsText(arquivo, 'UTF-8');
+        }
+
+        function parseCSVLine(linha) {
+            const resultado = [];
+            let atual = '';
+            let dentroAspas = false;
+
+            for (let i = 0; i < linha.length; i++) {
+                const char = linha[i];
+
+                if (char === '"') {
+                    dentroAspas = !dentroAspas;
+                } else if (char === ',' && !dentroAspas) {
+                    resultado.push(atual);
+                    atual = '';
+                } else {
+                    atual += char;
+                }
+            }
+
+            resultado.push(atual);
+            return resultado;
+        }
+
+        function limparMes() {
+            if (confirm(`Tem certeza que deseja limpar todos os dados de ${orcamento.mesesNomes[orcamento.mesAtual]} ${orcamento.anoAtual}?`)) {
+                if (orcamento.dados[orcamento.anoAtual]) {
+                    delete orcamento.dados[orcamento.anoAtual][orcamento.mesAtual];
+                }
+                orcamento.salvarDados();
+                orcamento.atualizarInterface();
+                orcamento.mostrarMensagem('Dados do mês removidos com sucesso!', 'success');
+            }
+        }
+
+        function limparAno() {
+            if (confirm(`Tem certeza que deseja limpar todos os dados do ano ${orcamento.anoAtual}?`)) {
+                delete orcamento.dados[orcamento.anoAtual];
+                orcamento.salvarDados();
+                orcamento.atualizarInterface();
+                orcamento.mostrarMensagem('Dados do ano removidos com sucesso!', 'success');
+            }
+        }
+    </script>
+</body>
+</html>
